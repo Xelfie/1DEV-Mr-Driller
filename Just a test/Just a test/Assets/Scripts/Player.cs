@@ -7,8 +7,16 @@ public class Player : MonoBehaviour
     private Rigidbody2D playerRigidbody;
     private Animator playerAnimator;
     [SerializeField] private float movementSpeed;
-    private bool jump;
     private bool facingRight;
+
+    [SerializeField] private Transform[] groundPoints; //will basically indicate if the player is on the ground or not based on 3 "groundPoints" that are empty child objects of player
+    [SerializeField] private float groundRadius; //to indicate how close  player needs to be to ground
+    [SerializeField] private LayerMask thisIsGround; //this is to see what is ground and what isn't ground
+    private bool isGrounded; //see in fixedUptade
+    private bool jump;
+    [SerializeField] private float jumpForce;
+    [SerializeField] private bool airControl; //if i want the player not being able to move in the air i can hehe
+
 
     // Start is called before the first frame update
     void Start()
@@ -30,14 +38,28 @@ public class Player : MonoBehaviour
         /*get the horizontal axis settings in:
         edit > Project Settings... > Input > Axes > Horizontal*/
         float horizontal = Input.GetAxis("Horizontal");
+
+        isGrounded = playerIsGrounded();
+
         movements(horizontal); //handles all of the player movements
+
         flipPlayer(horizontal); //says where the player is facing(if it's right or left)
-        resetTriggerValues(); //reset trigger value of trigger parameter in animator
+
+        resetValues(); //reset trigger value of trigger parameter in animator
     }
 
     private void movements(float horizontal) //handles all of the player movements
     {
-        playerRigidbody.velocity = new Vector2(horizontal * movementSpeed, playerRigidbody.velocity.y); //vector of x value = -1 and y = y
+        if (isGrounded || airControl)
+        {
+            playerRigidbody.velocity = new Vector2(horizontal * movementSpeed, playerRigidbody.velocity.y); //vector of x value = -1 and y = y
+        }
+
+        if (isGrounded && jump) //if he is grounded and he pressed space bar:
+        {
+            isGrounded = false; //he will not be grounded anymore
+            playerRigidbody.AddForce(new Vector2(0, jumpForce)); //will JUMP
+        }
 
         playerAnimator.SetFloat("speed",Mathf.Abs(horizontal)); //interact with the parameter speed in the animator (linked to the link between idle and run)
     }
@@ -62,8 +84,28 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void resetTriggerValues() //NOT FINISHED
+    private void resetValues() //NOT FINISHED
     {
         jump = false;
+    }
+
+    private bool playerIsGrounded()
+    {
+        if (playerRigidbody.velocity.y <= 0) //if player is falling
+        {
+            foreach (Transform point in groundPoints) //will see for all points in the groundPoints array
+            {
+                Collider2D[] colliders = Physics2D.OverlapCircleAll(point.position, groundRadius, thisIsGround); //the colliders array will contain all the collider that these ground points are colliding with
+
+                for (int i = 0; i < colliders.Length; i++) //will see for all colliders
+                {
+                    if (colliders[i].gameObject != gameObject) //if CURRENT collider we are looking at is different from player
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
