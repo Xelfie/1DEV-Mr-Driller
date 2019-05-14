@@ -6,6 +6,10 @@ public class CameraPosition : MonoBehaviour
     
     void LateUpdate()
     {
-        transform.position = new Vector3(transform.position.x, player.position.y, -15);
+        if (player.position.y < transform.position.y)
+        {
+            Vector3 newPosition = new Vector3(transform.position.x, player.position.y, -15);
+            transform.position = newPosition;
+        }
     }
 }
