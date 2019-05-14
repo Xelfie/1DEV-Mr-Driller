@@ -66,9 +66,9 @@ public class Player : MonoBehaviour
 
     private void inputHandler() //handle all of our input
     {
-        if (Input.GetKeyDown(KeyCode.Space)) //NOT FINISHED
+        if (Input.GetKeyDown(KeyCode.Space)) //if space bar is pressed...
         {
-            jump = true; //NOT FINISHED
+            jump = true; 
         }
     }
 
