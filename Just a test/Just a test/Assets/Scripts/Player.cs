@@ -22,7 +22,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         playerRigidbody = GetComponent<Rigidbody2D>();
-        facingRight = true;
+        facingRight = false;
         playerAnimator = GetComponent<Animator>();
     }
 
@@ -45,11 +45,18 @@ public class Player : MonoBehaviour
 
         flipPlayer(horizontal); //says where the player is facing(if it's right or left)
 
+        handleLayers();
+
         resetValues(); //reset trigger value of trigger parameter in animator
     }
 
     private void movements(float horizontal) //handles all of the player movements
     {
+        if (playerRigidbody.velocity.y < 0)
+        {
+            playerAnimator.SetBool("landing", true);
+        }
+
         if (isGrounded || airControl)
         {
             playerRigidbody.velocity = new Vector2(horizontal * movementSpeed, playerRigidbody.velocity.y); //vector of x value = -1 and y = y
@@ -59,6 +66,7 @@ public class Player : MonoBehaviour
         {
             isGrounded = false; //he will not be grounded anymore
             playerRigidbody.AddForce(new Vector2(0, jumpForce)); //will JUMP
+            playerAnimator.SetTrigger("jump"); //trigger the jump parameter
         }
 
         playerAnimator.SetFloat("speed",Mathf.Abs(horizontal)); //interact with the parameter speed in the animator (linked to the link between idle and run)
@@ -72,7 +80,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void flipPlayer(float horizontal) //says where the player is facing(if it's right or left)
+    private void flipPlayer(float horizontal) //says where the player is facing (if it's right or left)
     {
         if (horizontal > 0 && !facingRight || horizontal < 0 && facingRight)
         {
@@ -101,6 +109,8 @@ public class Player : MonoBehaviour
                 {
                     if (colliders[i].gameObject != gameObject) //if CURRENT collider we are looking at is different from player
                     {
+                        playerAnimator.ResetTrigger("jump"); //reset the jump trigger parameter in the Animator
+                        playerAnimator.SetBool("landing", false); //sets the landing parameter to false in the Animator
                         return true;
                     }
                 }
@@ -108,4 +118,17 @@ public class Player : MonoBehaviour
         }
         return false;
     }
+
+    private void handleLayers() //this function allows us to switch between layers in the Animator
+    {
+        if (!isGrounded)
+        {
+            playerAnimator.SetLayerWeight(1, 1); //set the weight to 1 on the AirLayer
+        }
+        else
+        {
+            playerAnimator.SetLayerWeight(1, 0); //set the weight to 0 on the AirLayer
+        }
+    }
+
 }
