@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class LifeOrDeath : MonoBehaviour
 {
-    public Transform renderedAirBar;
+    public static Transform renderedAirBar;
 
     
     
-    float timeLeft = 1f;
+    public static float timeLeft = 1f;
     float deltaTime = (1f / 1800f);
 
 
