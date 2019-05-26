@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Breathe : MonoBehaviour
+public class FreshAir : MonoBehaviour
 {
 
     void OnTriggerEnter2D(Collider2D collision)
@@ -17,6 +17,6 @@ public class Breathe : MonoBehaviour
 
         LifeOrDeath.renderedAirBar.localScale = new Vector3(LifeOrDeath.timeLeft, 1f); // update the Air Bar
 
-        Destroy(gameObject, 0.03f); // remove the air capsule from the game after 0.03 seconds
+        Destroy(gameObject); // remove the air capsule from the game
     }
 }
